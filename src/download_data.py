@@ -61,14 +61,31 @@ URL_TEMPLATE = (
     "/resource/{resource_id}/download/311-service-requests-{year}.csv"
 )
 
+# Council District boundaries + 2020 census population -- the supplementary
+# dataset src/clean.py joins against for the per-capita analysis. Pulled
+# from the city's ArcGIS Hub, not the CKAN portal the 311 data lives on.
+COUNCIL_DISTRICTS_URL = (
+    "https://gisdata-csj.opendata.arcgis.com/api/download/v1/items/"
+    "001373893c8347d4b36cf15a6103f78c/geojson?layers=120"
+)
 
-def download_year(year: int, resource_id: str, dest_dir: pathlib.Path) -> pathlib.Path:
-    dest = dest_dir / f"311-service-requests-{year}.csv"
-    url = URL_TEMPLATE.format(resource_id=resource_id, year=year)
+
+def _fetch(url: str, dest: pathlib.Path) -> pathlib.Path:
     req = urllib.request.Request(url, headers={"User-Agent": "sj311-analytics/1.0"})
     with _opener.open(req, timeout=90) as resp, open(dest, "wb") as f:
         f.write(resp.read())
     return dest
+
+
+def download_year(year: int, resource_id: str, dest_dir: pathlib.Path) -> pathlib.Path:
+    dest = dest_dir / f"311-service-requests-{year}.csv"
+    url = URL_TEMPLATE.format(resource_id=resource_id, year=year)
+    return _fetch(url, dest)
+
+
+def download_council_districts(dest_dir: pathlib.Path) -> pathlib.Path:
+    dest = dest_dir / "council_districts.geojson"
+    return _fetch(COUNCIL_DISTRICTS_URL, dest)
 
 
 def main() -> None:
@@ -78,6 +95,13 @@ def main() -> None:
         path = download_year(year, resource_id, RAW_DIR)
         size_mb = path.stat().st_size / 1_000_000
         print(f"  -> {path} ({size_mb:.1f} MB)", file=sys.stderr)
+
+    supplementary_dir = RAW_DIR / "supplementary"
+    supplementary_dir.mkdir(parents=True, exist_ok=True)
+    print("Downloading council district boundaries...", file=sys.stderr)
+    path = download_council_districts(supplementary_dir)
+    size_mb = path.stat().st_size / 1_000_000
+    print(f"  -> {path} ({size_mb:.1f} MB)", file=sys.stderr)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 # Raw and intermediate data are too large / regenerable for git — see src/download_data.py
 data/raw/*.csv
+data/raw/supplementary/*.geojson
 data/processed/*.csv
 data/processed/*.db
 *.sqlite3
