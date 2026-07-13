@@ -6,12 +6,16 @@ them separate (rather than one big transform) is deliberate: in an interview
 you can point at `flag_missing_geo` and explain the (0,0)-encoding gotcha
 without having to narrate the whole pipeline.
 """
+import json
 import pathlib
 
 import numpy as np
 import pandas as pd
+import shapely
+from shapely.geometry import shape
 
 RAW_DIR = pathlib.Path(__file__).resolve().parent.parent / "data" / "raw"
+SUPPLEMENTARY_DIR = RAW_DIR / "supplementary"
 PROCESSED_DIR = pathlib.Path(__file__).resolve().parent.parent / "data" / "processed"
 
 YEARS = [2021, 2022, 2023, 2024]
@@ -131,6 +135,48 @@ def add_calendar_flags(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def load_council_districts() -> tuple[list, pd.DataFrame]:
+    """Council district boundaries + 2020 census population, from the same
+    open data portal as the 311 data. This is the supplementary dataset
+    that turns a single flat table into an actual joinable schema: a
+    request only has raw lat/long, but a district has a population, which
+    is what makes a per-capita request rate possible."""
+    geo = json.loads((SUPPLEMENTARY_DIR / "council_districts.geojson").read_text())
+    polygons, rows = [], []
+    for feat in geo["features"]:
+        polygons.append(shape(feat["geometry"]))
+        props = feat["properties"]
+        rows.append(
+            {
+                "district_id": props["DISTRICT"],
+                "council_member": props["COUNCILMEMBER"],
+                "population_2020": int(props["POPULATION"]),
+            }
+        )
+    return polygons, pd.DataFrame(rows)
+
+
+def assign_council_district(df: pd.DataFrame, polygons: list, districts: pd.DataFrame) -> pd.DataFrame:
+    """Point-in-polygon spatial join: only possible for the 43% of rows with
+    real (non-(0,0)) coordinates. A point-in-polygon match at San Jose's
+    scale (1.1M points, 10 polygons) is O(n*m) if done naively; STRtree
+    indexes the polygons so each point query is O(log m) instead."""
+    tree = shapely.STRtree(polygons)
+    df["district_id"] = pd.array([None] * len(df), dtype="object")
+
+    valid_mask = df["latitude"].notna() & df["longitude"].notna()
+    valid_idx = df.index[valid_mask]
+    points = shapely.points(df.loc[valid_idx, "longitude"].to_numpy(), df.loc[valid_idx, "latitude"].to_numpy())
+
+    point_pos, poly_pos = tree.query(points, predicate="within")
+    district_ids = districts["district_id"].to_numpy()
+    # A handful of valid points fall outside every district polygon (near
+    # city-boundary edges or minor geocoding imprecision) and are left
+    # null rather than force-assigned to the nearest district.
+    df.loc[valid_idx[point_pos], "district_id"] = district_ids[poly_pos]
+    return df
+
+
 def assert_no_duplicate_incidents(df: pd.DataFrame) -> None:
     """Log #9: verified, not assumed. Fails loudly if a future data pull
     introduces duplicates a naive re-run would otherwise mask."""
@@ -138,7 +184,7 @@ def assert_no_duplicate_incidents(df: pd.DataFrame) -> None:
     assert n_dupes == 0, f"Expected no duplicate incident_id, found {n_dupes}"
 
 
-def clean() -> pd.DataFrame:
+def clean() -> tuple[pd.DataFrame, pd.DataFrame]:
     df = load_raw()
     df = parse_dates(df)
     df = drop_sparse_category(df)
@@ -149,15 +195,28 @@ def clean() -> pd.DataFrame:
     df = compute_resolution_hours(df)
     df = add_calendar_flags(df)
     assert_no_duplicate_incidents(df)
-    return df
+
+    polygons, districts = load_council_districts()
+    df = assign_council_district(df, polygons, districts)
+
+    return df, districts
 
 
 def main() -> None:
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-    df = clean()
+    df, districts = clean()
+
     out_path = PROCESSED_DIR / "requests_clean.csv"
     df.to_csv(out_path, index=False)
     print(f"Wrote {len(df):,} rows to {out_path}")
+
+    districts_path = PROCESSED_DIR / "council_districts.csv"
+    districts.to_csv(districts_path, index=False)
+    print(f"Wrote {len(districts):,} rows to {districts_path}")
+
+    matched = df["district_id"].notna().sum()
+    geo_valid = (~df["is_geo_missing"]).sum()
+    print(f"District match rate: {matched:,} / {geo_valid:,} geo-valid rows ({matched/geo_valid:.1%})")
     print(df.dtypes)
 
 

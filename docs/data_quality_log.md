@@ -18,6 +18,8 @@ README methodology section.
 | 8 | `Status` has 5 values; only `Closed` (91.9%) has a meaningful resolution time | all years | Compute `resolution_hours` only for `Closed` rows; `Open`/`In Progress`/`ReAssigned`/`Referred` rows are right-censored (still unresolved) and excluded from resolution-time analysis, but retained for volume/backlog metrics | Treating an open ticket's current age as its "resolution time" would understate true resolution time and bias it downward |
 | 9 | No duplicate `Incident_ID` values | all years | No dedup needed | Verified rather than assumed — worth stating explicitly since duplicate tickets were a real risk from a multi-channel intake system |
 
+| 10 | Council district spatial join (point-in-polygon against city council boundaries) doesn't match every geo-valid point | 2,804 of 483,253 geo-valid rows (0.6%) | Leave `district_id` null for unmatched points rather than snapping to the nearest district | These points likely sit just outside the city limits or reflect minor geocoding imprecision at a boundary; forcing them into "the nearest district" would fabricate precision the source data doesn't have |
+
 **Net effect on row counts:** all 1,123,066 rows are retained in the fact
 table (nothing is silently dropped); the flags above (`is_zero_duration`,
 `is_geo_missing`, `is_duration_capped`) let each downstream query decide

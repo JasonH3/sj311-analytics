@@ -20,3 +20,4 @@ seaborn==0.13.2
 SQLAlchemy==2.0.51
 statsmodels==0.14.6
 certifi==2026.6.17
+shapely==2.1.2
