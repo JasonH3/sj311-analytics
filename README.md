@@ -8,8 +8,7 @@ requests (2021–2024) cleaned, modeled into a star schema, queried with SQL
 window functions, and tested statistically to separate real operational
 bottlenecks from artifacts of raw request volume.
 
-**Live dashboard:** _(publish via `tableau/BUILD_GUIDE.md`, then add the
-Tableau Public link here)_
+**Live dashboard:** [San Jose 311 Response Time Analysis on Tableau Public](https://public.tableau.com/app/profile/jason.he1381/viz/SanJose311ResponseTimeAnalysis/Dashboard1)
 
 ## Problem statement
 
