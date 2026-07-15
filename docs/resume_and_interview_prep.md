@@ -11,6 +11,8 @@ data engineering-leaning roles: lead with #1/#2).
 
 3. **Applied hypothesis testing and regression (SciPy, statsmodels) to separate real operational drivers from confounded raw metrics** — quantified that weekend-submitted requests take ~219% longer to resolve and that a naive volume-based district ranking would have misdirected resource allocation, informing 4 quantified recommendations delivered via an interactive Tableau Public dashboard.
 
+4. **Designed and published an interactive Tableau Public dashboard for a non-technical audience** — KPI banner with an inverted anchor tile, emphasis-color category ranking, quarterly dual-axis trend, and a 350K-point density map with cross-chart filtering; applied a deliberate two-color design system and resolved desktop-vs-web rendering differences (label suppression, layout clipping) before publishing at a fixed canvas size.
+
 ## Interview prep
 
 **"Walk me through this project."**
@@ -79,3 +81,53 @@ district findings only cover the geo-valid subset; (2) add department
 fixed effects to the regression to properly separate a within-department
 backlog effect from the cross-department compositional effect flagged in
 the findings.
+
+## Dashboard-specific questions
+
+**"Walk me through your dashboard."**
+Follow the layout top to bottom, because it was designed to be read that
+way: the KPI banner answers "how big is this and is it working" in four
+numbers (with the open backlog inverted to navy as the deliberate anchor —
+the number with tension in it); the two charts answer "what's slow and is
+it getting worse"; the map and findings panel answer "where, and so what."
+Mention the interaction: clicking a category bar cross-filters every card.
+Chart titles are assertive statements ("Two services account for the
+city's longest waits") rather than labels — the dashboard argues its
+findings instead of just displaying data.
+
+**"Why is only one KPI tile dark? / Why is only one bar orange?"**
+Same answer for both: emphasis only works by contrast. The design system
+is one dark brand color (navy) plus one accent (orange), and the accent
+appears exactly once per chart — the highlighted bar, the key line, the
+anchor tile. If everything is loud, nothing is. This also gives a
+consistent reading rule across the dashboard: orange marks where the
+story is.
+
+**"Your trend chart is dual-axis — isn't that misleading?"**
+Fair challenge, and the trade-off was considered: two y-scales on one plot
+can imply correlations that are artifacts of scale alignment. I evaluated
+splitting it into two stacked panes sharing the time axis and kept the
+dual axis for space reasons at the dashboard's fixed canvas size — with
+the mitigations that each measure keeps its own labeled axis and distinct
+encoding (bars vs. line). Given a wider layout I'd split it; the point of
+the chart survives either way (volume rises steadily while median
+resolution time moves seasonally, not with load).
+
+**"Any surprises getting it published?"**
+Two worth telling. First, Tableau Public's web renderer uses slightly
+different font metrics than the desktop app, so text that fit exactly on
+desktop clipped or had its mark labels silently suppressed on the web —
+the fix was publishing at a fixed canvas size and leaving deliberate slack
+in text zones. Second, the map exposed a data quality issue the pipeline
+hadn't caught: a handful of requests plotted in Europe and Asia because of
+sign-flipped longitudes (+121.9 instead of -121.9) — invisible in any
+aggregate table, obvious the moment the points hit a map. Good example of
+why you visualize data you think is already clean.
+
+**"Only ~43% of requests are on the map — why?"**
+Missing GPS in the source is encoded as (0,0) rather than null — 57% of
+rows. Treating those as real coordinates would put half a million points
+in the ocean off West Africa, so the pipeline nulls them and the map
+covers the geo-valid subset only. The dashboard states this limitation on
+its face rather than hiding it, and the district-level findings are
+scoped accordingly.
