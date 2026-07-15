@@ -37,10 +37,10 @@ freely.
 
 1. Open Tableau → left sidebar **Connect > To a File > Text file** (a CSV
    is a "text file" in Tableau's menu).
-2. In the file picker press **Cmd+Shift+G**, paste
-   `/Users/jasonhe/claude/sj311-analytics/data/processed/`, choose
-   **tableau_extract.csv**. (If the file doesn't exist, run
-   `python3 src/export_tableau_extract.py` first.)
+2. In the file picker press **Cmd+Shift+G**, paste the full path to this
+   repo's `data/processed/` folder, and choose **tableau_extract.csv**.
+   (If the file doesn't exist, run `python3 src/export_tableau_extract.py`
+   first.)
 3. On the Data Source screen, check two column types in the preview grid
    (the icon above each column name):
    - `Date Created Ts` → should show a **calendar+clock** icon. If not:

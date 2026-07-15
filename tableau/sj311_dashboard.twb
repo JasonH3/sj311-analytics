@@ -40,7 +40,7 @@
       <connection class='federated'>
         <named-connections>
           <named-connection caption='tableau_extract' name='textscan.1dklvl31t9metl1f1ol650t90crx'>
-            <connection class='textscan' directory='/Users/jasonhe/claude/sj311-analytics/data/processed' filename='tableau_extract.csv' password='' server='' workgroup-auth-mode='as-is' />
+            <connection class='textscan' directory='data/processed' filename='tableau_extract.csv' password='' server='' workgroup-auth-mode='as-is' />
           </named-connection>
         </named-connections>
         <relation connection='textscan.1dklvl31t9metl1f1ol650t90crx' name='tableau_extract.csv' table='[tableau_extract#csv]' type='table'>
