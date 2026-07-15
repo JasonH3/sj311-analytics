@@ -2,16 +2,18 @@
 
 ## Resume bullets
 
-Pick 2-3 depending on the role (data analyst roles: lead with #1/#3;
-data engineering-leaning roles: lead with #1/#2).
+Pick 2-3 per role: analyst roles → 1, 3, 4; data-engineering-leaning
+roles → 1, 2, 3. Bullet 3 is the strongest (it has a finding with a
+twist) and belongs everywhere. The em-dash clauses are trimmable if space
+is tight.
 
-1. **Built an end-to-end analytics pipeline on 1.1M+ civic service records** (Python/pandas, SQLite star schema, SQL window functions) to identify response-time bottlenecks for a city 311 system, documenting and resolving 10 distinct data quality issues including a mid-dataset system migration that silently changed the source taxonomy.
+1. Built an end-to-end Python and SQL pipeline to analyze 1.1M San Jose 311 service requests, cleaning 10 documented data-quality problems along the way — including missing GPS coordinates disguised as valid (0,0) points and a mid-dataset system migration that made four years of records silently incomparable.
 
-2. **Designed a 6-dimension star schema and 10 analytical SQL queries** (CTEs, `RANK`/`LAG`/`NTILE` window functions, multi-table joins) to surface per-district, per-category resolution-time patterns across 4 years of data; added a supplementary geospatial join (Shapely point-in-polygon against council district boundaries) to enable per-capita request-rate analysis.
+2. Modeled the cleaned data into a star-schema database and wrote 10 SQL analyses (joins, CTEs, window functions) to rank the city's slowest services and districts, joining census population data so districts could be compared fairly per capita.
 
-3. **Applied hypothesis testing and regression (SciPy, statsmodels) to separate real operational drivers from confounded raw metrics** — quantified that weekend-submitted requests take ~219% longer to resolve and that a naive volume-based district ranking would have misdirected resource allocation, informing 4 quantified recommendations delivered via an interactive Tableau Public dashboard.
+3. Used hypothesis testing and regression (SciPy, statsmodels) to find what actually drives slow response times: weekend requests take ~3x longer to resolve, one service category is the citywide bottleneck, and the "busiest" district turned out to be the fastest once request mix was controlled for — reversing where a raw-volume ranking would have sent resources.
 
-4. **Designed and published an interactive Tableau Public dashboard for a non-technical audience** — KPI banner with an inverted anchor tile, emphasis-color category ranking, quarterly dual-axis trend, and a 350K-point density map with cross-chart filtering; applied a deliberate two-color design system and resolved desktop-vs-web rendering differences (label suppression, layout clipping) before publishing at a fixed canvas size.
+4. Designed and published an interactive Tableau Public dashboard of the findings for a non-technical audience, with cross-chart filtering and a 350K-point density map.
 
 ## Interview prep
 
