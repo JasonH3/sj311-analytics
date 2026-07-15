@@ -5,6 +5,14 @@ data/processed/*.csv
 data/processed/*.db
 *.sqlite3
 
+# Tableau working files in the repo root (the canonical workbook is
+# tableau/sj311_dashboard.twb; extracts/.twbx are data, not source)
+/*.twb
+/*.twbx
+*.twbr
+*.hyper
+.~*
+
 # Python
 .venv/
 __pycache__/

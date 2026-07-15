@@ -41,7 +41,7 @@ null — is documented in **[`docs/data_quality_log.md`](docs/data_quality_log.m
 | Analysis | SQL (`sql/analysis/*.sql`) | 10 queries — CTEs, window functions (`NTILE`, `RANK`, `LAG`), joins across every dimension |
 | EDA | Matplotlib / Seaborn (`notebooks/01_eda.ipynb`) | Distribution, seasonal trend, district×category heatmap, channel comparison |
 | Statistics | SciPy / statsmodels (`notebooks/02_statistical_analysis.ipynb`) | Mann-Whitney U test + OLS regression on log(resolution time) |
-| Dashboard | Tableau Public (`tableau/`) | KPI cards, map, category drill-down, trend line — see `tableau/BUILD_GUIDE.md` |
+| Dashboard | Tableau Public (`tableau/`) | KPI cards, map, category drill-down, trend line. Workbook source: `tableau/sj311_dashboard.twb`; build steps in `tableau/BUILD_GUIDE.md`, visual design in `tableau/RESTYLE_GUIDE.md` |
 
 **Engine note:** the database is SQLite rather than PostgreSQL. SQLite
 (3.25+) fully supports CTEs and window functions, so nothing in the "real

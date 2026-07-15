@@ -9,6 +9,16 @@ is independently shippable, so you can stop after any part and republish.
 **Time: ~90 minutes total. Republish under the same title when done — the
 URL doesn't change.**
 
+**Final build notes — where the published dashboard deviates from this
+guide, and why:** (1) Part 5's dual-axis split was evaluated and skipped —
+the trend keeps its dual axis for space reasons, with both marks recolored
+to the palette (muted navy bars, orange line); the trade-off is understood.
+(2) Chart titles use the assertive-statement style ("Two services account
+for the city's longest waits") rather than the question style — one
+convention, applied consistently. (3) Bar labels are enabled on the
+worksheet but suppressed by Tableau at the dashboard's card size; values
+remain available via tooltips on the published interactive version.
+
 ---
 
 ## Part 0 — Pick the palette (write these down, 2 min)
